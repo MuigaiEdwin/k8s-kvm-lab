@@ -114,20 +114,17 @@ Rocky Linux 9 (RHEL-compatible, free) was used as the guest OS for all three nod
 
 Each node was provisioned with `virt-install` using identical specs (1 vCPU, 1GB RAM, 15GB qcow2 disk), differing only by `--name`:
 
-```bash
 virt-install \
-  --name node1 \
-  --ram 1024 \
-  --vcpus 1 \
-  --disk path=/var/lib/libvirt/images/node1.qcow2,size=15,format=qcow2 \
-  --os-variant rocky9 \
+  --name master \
+  --virt-type kvm \
+  --ram 4096 \
+  --vcpus 4 \
+  --disk path=/var/lib/libvirt/images/master.qcow2,size=50,format=qcow2 \
+  --os-variant ubuntu20.04 \
   --network network=default \
-  --graphics none \
-  --console pty,target_type=serial \
-  --location /var/lib/libvirt/images/Rocky-9-latest-x86_64-minimal.iso \
-  --extra-args 'console=ttyS0,115200n8 serial' \
-  --noreboot
-```
+  --graphics vnc,listen=0.0.0.0 \
+  --cdrom /path/to/ubuntu-20.04-server.iso \
+  --noautoconsole
 
 The same command was repeated for `node2` and `node3`.
 
@@ -201,7 +198,7 @@ This step was repeated on `node2` and `node3` with their respective hostnames se
 ## Outcome
 
 At the end of this phase:
-- 3 Rocky Linux 9 VMs running under KVM/QEMU on a single RHEL 9 host
+- 3 ubuntu VMs running under KVM/QEMU on a single RHEL 9 host
 - Static IPs assigned and resolvable via `/etc/hosts` across all nodes
 - Nested virtualization and libvirt networking confirmed working
 
