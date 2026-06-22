@@ -30,11 +30,11 @@ Stack:
 
 | # | Document | What it covers |
 |---|---|---|
-| 01 | [Virtualization Setup](docs/01-virtualization.md) | Install KVM on RHEL host, create 3 VMs |
-| 02 | [Kubernetes Prerequisites](docs/02-prerequisites.md) | Prepare all 3 nodes before kubeadm |
-| 03 | [Cluster Initialization](docs/03-cluster-init.md) | kubeadm init on master, join workers |
-| 04 | [Cilium CNI](docs/04-cilium.md) | Install CNI, fix HWE kernel requirement |
-| 05 | [Deploy & Verify](docs/05-deploy-nginx.md) | nginx deployment, NodePort, verification |
+| 01 | [Virtualization Setup](./docs/01-virtualization.md) | Install KVM on RHEL host, create 3 VMs |
+| 02 | [Kubernetes Prerequisites](./docs/02-prerequisites.md) | Prepare all 3 nodes before kubeadm |
+| 03 | [Cluster Initialization](./docs/03-cluster-init.md) | kubeadm init on master, join workers |
+| 04 | [Cilium CNI](./docs/04-cilium.md) | Install CNI, fix HWE kernel requirement |
+| 05 | [Deploy & Verify](./docs/05-deploy-nginx.md) | nginx deployment, NodePort, verification |
 
 ---
 
@@ -58,11 +58,11 @@ Stack:
 
 | Error | Fix | Doc |
 |---|---|---|
-| `unknown service runtime.v1.RuntimeService` | Regenerate containerd config | [02](docs/02-prerequisites.md) |
-| `bpf_get_current_cgroup_id() not available` | Install HWE kernel (5.15) | [04](docs/04-cilium.md) |
-| Swap re-enables after reboot | Comment out swap in `/etc/fstab` | [02](docs/02-prerequisites.md) |
-| Node loses IP after reboot | Set static IP on master via netplan | [01](docs/01-virtualization.md) |
-| Pod stuck in `Terminating` | Force delete + restart containerd | [04](docs/04-cilium.md) |
+| `unknown service runtime.v1.RuntimeService` | Regenerate containerd config | [02](./docs/02-prerequisites.md) |
+| `bpf_get_current_cgroup_id() not available` | Install HWE kernel (5.15) | [04](./docs/04-cilium.md) |
+| Swap re-enables after reboot | Comment out swap in `/etc/fstab` | [02](./docs/02-prerequisites.md) |
+| Node loses IP after reboot | Set static IP on master via netplan | [01](./docs/01-virtualization.md) |
+| Pod stuck in `Terminating` | Force delete + restart containerd | [04](./docs/04-cilium.md) |
 
 ---
 
@@ -77,4 +77,4 @@ Ready-to-use Kubernetes manifests are in the [`manifests/`](manifests/) folder:
 
 ## Confidentiality Note
 
-All IP addresses, hostnames, MAC addresses, tokens, and certificate hashes in this guide are placeholders. Replace them with your own values. No real infrastructure details are included.
+All IP addresses, hostnames, MAC addresses, tokens, and certificate hashes in this guide are placeholders. Replace them with your own values. 
