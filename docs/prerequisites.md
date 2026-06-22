@@ -2,7 +2,6 @@
 
 These steps were run on **every node** (`master`, `node1`, `node2`) as root, after the VMs were provisioned (see `01-virtualization.md`).
 
-> Placeholders like `<MASTER_IP>`, `<NODE1_IP>`, `<NODE2_IP>`, `<GATEWAY>` stand in for real addresses.
 
 ## VM Specs Used
 
