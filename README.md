@@ -35,6 +35,7 @@ Stack:
 | 03 | [Cluster Initialization](./docs/03-cluster-init.md) | kubeadm init on master, join workers |
 | 04 | [Cilium CNI](./docs/04-cilium.md) | Install CNI, fix HWE kernel requirement |
 | 05 | [Deploy & Verify](./docs/05-deploy-nginx.md) | nginx deployment, NodePort, verification |
+| 06 | [Deploy and access the web UI dashboard](./docs/06-dashboard.md) | nginx deployment, NodePort, verification |
 
 ---
 
