@@ -1,9 +1,9 @@
-# 01 — Virtualization Setup (KVM/QEMU on RHEL Host)
+# 01 > Virtualization Setup (KVM/QEMU on RHEL Host)
 
 This document covers how the lab's 3-node Kubernetes cluster was virtualized on a single RHEL 9 host using KVM/QEMU + libvirt, before any Kubernetes installation happened.
 
 
-## Phase 1 — Environment Check
+## Phase 1 - Environment Check
 
 Before enabling virtualization, the host was validated for OS version, available RAM/CPU, nested virtualization support, and free disk space.
 
@@ -15,14 +15,13 @@ df -h /var/lib/libvirt/images 2>/dev/null || df -h /
 ```
 
 **Findings:**
-- OS: RHEL 9.x ✅
+- OS: ubuntu-20.04
 - RAM/CPU: sufficient for 3 lightweight VMs (≥4GB free RAM, ≥4 cores)
 - Nested virtualization flag (`vmx`/`svm`) present in `/proc/cpuinfo`
 - Disk space: ≥30–40GB free under `/var/lib/libvirt/images`
 
----
 
-## Phase 2 — Enable Nested Virtualization
+## Phase 2 - Enable Nested Virtualization
 
 CPU vendor was identified first:
 
@@ -46,9 +45,8 @@ cat /sys/module/kvm_intel/parameters/nested   # should return Y
 
 (AMD equivalent uses `kvm_amd` / `kvm-amd.conf` with the same pattern.)
 
----
 
-## Phase 3 — Install KVM Hypervisor
+## Phase 3 - Install KVM Hypervisor
 
 ```bash
 dnf install -y qemu-kvm libvirt libvirt-client virt-install bridge-utils virt-viewer
@@ -70,9 +68,8 @@ virsh nodeinfo
 
 Result: `libvirtd` active and running, KVM modules loaded, `virsh` operational with an empty VM list.
 
----
 
-## Phase 4 — Networking
+## Phase 4 - Networking
 
 ```bash
 virsh net-list --all
@@ -93,24 +90,20 @@ A default NAT-based virtual network (bridge `virbr0`) was confirmed active, prov
 node1  node2  node3   ← <NODE_IP_1> / <NODE_IP_2> / <NODE_IP_3>
 ```
 
----
-
-## Phase 5 — VM Disk Storage
+## Phase 5 - VM Disk Storage
 
 ```bash
 mkdir -p /var/lib/libvirt/images
 df -h /var/lib/libvirt/images
 
 cd /var/lib/libvirt/images
-curl -LO https://download.rockylinux.org/pub/rocky/9/isos/x86_64/Rocky-9-latest-x86_64-minimal.iso
-ls -lh Rocky-9-latest-x86_64-minimal.iso
+curl -LO https://download.rockylinux.org/pub/rocky/9/isos/x86_64/ubuntu-20.04-server.iso
+ls -lh ubuntu-20.04-server.iso
 ```
 
-Rocky Linux 9 (RHEL-compatible, free) was used as the guest OS for all three nodes.
+Ubuntu (RHEL-compatible, free) was used as the guest OS for all three nodes.
 
----
-
-## Phase 6 — Create the 3 VMs
+## Phase 6 - Create the 3 VMs
 
 Each node was provisioned with `virt-install` using identical specs (1 vCPU, 1GB RAM, 15GB qcow2 disk), differing only by `--name`:
 
@@ -154,9 +147,8 @@ Resulting mapping (placeholders):
 | node2 | `<NODE_IP_2>` |
 | node3 | `<NODE_IP_3>` |
 
----
 
-## Phase 7 — Per-VM Configuration
+## Phase 7 - Per-VM Configuration
 
 For each VM, connected via serial console:
 
@@ -193,7 +185,6 @@ EOF
 
 This step was repeated on `node2` and `node3` with their respective hostnames set.
 
----
 
 ## Outcome
 
@@ -204,15 +195,13 @@ At the end of this phase:
 
 This formed the base infrastructure on top of which Kubernetes prerequisites and `kubeadm` cluster initialization were performed (see `02-prerequisites.md` and `03-cluster-init.md`).
 
----
-
-## Known Issue — Node Loses IP After Reboot (DHCP delay)
+## Known Issue - Node Loses IP After Reboot (DHCP delay)
 
 **Symptom:** A VM is unreachable over SSH after a reboot.
 
 **Cause:** DHCP lease renewal on the virtual bridge (`virbr0`) can lag behind the VM finishing boot, so the node comes up without (or with a stale) IP.
 
-**Fix — from the VM console:**
+**Fix - from the VM console:**
 
 ```bash
 netplan apply
@@ -241,5 +230,4 @@ network:
 ```bash
 netplan apply
 ```
-
 Static IPs avoid this class of issue entirely and keep `kubeadm`'s `--apiserver-advertise-address` stable across reboots.
