@@ -1,0 +1,304 @@
+# Observability — Kubernetes Dashboard, Prometheus & Grafana
+
+This is the part where the cluster stops being a black box.
+
+Up until this point everything was command-line — `kubectl get nodes`, `kubectl get pods`, staring at text output and hoping the colours were right. Adding the dashboard, Prometheus, and Grafana changes that completely. You can actually *see* what the cluster is doing.
+
+Here's what I set up, how each piece fits together, and how to get into all three.
+
+---
+
+## What Each Tool Actually Does
+
+Before installing anything, it's worth being clear on what problem each tool solves — because they're often lumped together but they do very different things.
+
+**Kubernetes Dashboard** is the official web UI for the cluster. It lets you see what's running, check pod logs, look at events, and manage resources — all from a browser. Think of it as a window into the cluster's current state.
+
+**Prometheus** is a metrics database. It runs inside the cluster and every 30 seconds it scrapes numbers from everything — how much CPU each pod is using, how much memory is free on each node, how many requests are hitting each service. It stores all of this over time. It doesn't display anything itself — it just collects and stores.
+
+**Grafana** connects to Prometheus and draws charts from the data it has collected. It's the tool you actually look at when you want to understand what's happening with performance over time.
+
+The simplest way to think about it:
+
+```
+Prometheus  →  the recorder
+Grafana     →  the screen
+Dashboard   →  the control panel
+```
+
+---
+
+## How They All Fit Into the Cluster
+
+```
+My cluster
+│
+├── kube-system namespace
+│     ├── metrics-server        ← feeds kubectl top nodes/pods
+│     ├── cilium (x3)           ← pod networking
+│     ├── coredns (x2)          ← DNS inside the cluster
+│     └── kube-proxy (x3)       ← network routing per node
+│
+├── monitoring namespace
+│     ├── prometheus            ← scrapes metrics every 30s
+│     ├── grafana               ← draws charts from prometheus
+│     ├── alertmanager          ← sends alerts when things break
+│     ├── kube-state-metrics    ← watches K8s objects (pods, deployments)
+│     └── node-exporter (x3)   ← one per node, collects OS stats
+│
+├── kubernetes-dashboard namespace
+│     ├── dashboard-web         ← the UI you see in the browser
+│     ├── dashboard-api         ← serves data to the UI
+│     ├── dashboard-auth        ← handles login tokens
+│     └── dashboard-kong        ← API gateway layer
+│
+└── default namespace
+      └── nginx (x2)            ← the test deployment
+```
+
+Node exporter runs on every single node and collects things like CPU usage, disk I/O, memory, and network traffic at the OS level. Kube-state-metrics watches the Kubernetes API and reports on things like how many pods are running versus how many should be running. Both feed into Prometheus, which Grafana then queries to draw the dashboards.
+
+---
+
+## Install the Kubernetes Dashboard
+
+```bash
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+helm repo update
+
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
+  --create-namespace \
+  --namespace kubernetes-dashboard
+```
+
+Verify it came up:
+
+```bash
+kubectl get pods -n kubernetes-dashboard
+# All pods should show Running
+```
+
+### Create an admin user
+
+The dashboard needs a service account with cluster-admin permissions to show you everything:
+
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kubernetes-dashboard
+EOF
+```
+
+### Create a permanent token (so you don't have to regenerate every hour)
+
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: admin-user-token
+  namespace: kubernetes-dashboard
+  annotations:
+    kubernetes.io/service-account.name: admin-user
+type: kubernetes.io/service-account-token
+EOF
+```
+
+Get the token:
+
+```bash
+kubectl -n kubernetes-dashboard get secret admin-user-token \
+  -o jsonpath="{.data.token}" | base64 -d
+```
+
+Save that token somewhere — it doesn't expire.
+
+### Expose via NodePort
+
+```bash
+kubectl patch svc kubernetes-dashboard -n kubernetes-dashboard \
+  --type='json' \
+  -p='[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
+
+kubectl get svc -n kubernetes-dashboard
+```
+
+Open in browser:
+
+```
+https://<ANY_NODE_IP>:<NODE_PORT>
+```
+
+Accept the certificate warning, paste your token, and you're in.
+
+---
+
+## Install Prometheus + Grafana
+
+Both are installed together via the `kube-prometheus-stack` Helm chart — this is the standard way to do it and it sets up everything including the pre-built Grafana dashboards automatically.
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --create-namespace
+```
+
+Verify everything came up:
+
+```bash
+kubectl get pods -n monitoring
+# You should see: prometheus, grafana, alertmanager,
+# kube-state-metrics, and node-exporter (one per node)
+```
+
+### Expose Grafana
+
+```bash
+kubectl patch svc prometheus-grafana -n monitoring \
+  --type='json' \
+  -p='[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
+
+kubectl get svc prometheus-grafana -n monitoring
+# Note the NodePort assigned
+```
+
+Get your login credentials:
+
+```bash
+# Username
+kubectl get secret -n monitoring prometheus-grafana \
+  -o jsonpath="{.data.admin-user}" | base64 -d
+
+# Password
+kubectl get secret -n monitoring prometheus-grafana \
+  -o jsonpath="{.data.admin-password}" | base64 -d
+```
+
+Open Grafana:
+
+```
+http://<ANY_NODE_IP>:<GRAFANA_PORT>
+```
+
+Change the password once you're in — Profile → Change Password.
+
+### Expose Prometheus (optional — useful for querying directly)
+
+```bash
+kubectl patch svc prometheus-kube-prometheus-prometheus -n monitoring \
+  --type='json' \
+  -p='[{"op":"replace","path":"/spec/type","value":"NodePort"}]'
+
+kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
+```
+
+Open Prometheus:
+
+```
+http://<ANY_NODE_IP>:<PROMETHEUS_PORT>
+```
+
+---
+
+## Install Metrics Server (required for kubectl top)
+
+Without this, `kubectl top nodes` and the CPU/memory graphs in the dashboard don't work.
+
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+Patch it to work with kubeadm's self-signed certs:
+
+```bash
+kubectl patch deployment metrics-server -n kube-system \
+  --type='json' \
+  -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+```
+
+Verify:
+
+```bash
+kubectl top nodes
+# NAME     CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
+# master   433m         10%    2344Mi          61%
+# node1    260m         6%     1711Mi          44%
+# node2    328m         8%     2014Mi          52%
+```
+
+---
+
+## What to Look At in Each Tool
+
+### Kubernetes Dashboard
+
+- **Cluster → Nodes** — all 3 nodes, CPU and memory per node
+- **Workloads → Pods** — all 31 pods across all namespaces, live status
+- **Workloads → Deployments** — nginx showing 2/2 replicas
+- **Click any pod → Logs** — live log stream directly in the browser
+
+### Prometheus
+
+Try these queries in the expression bar:
+
+```promql
+# Everything being monitored — should all return 1 (up)
+up
+
+# Available memory per node in bytes
+node_memory_MemAvailable_bytes
+
+# CPU usage percentage per node
+100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+```
+
+### Grafana
+
+The Helm chart pre-loads a full set of dashboards. The most useful ones:
+
+- **Kubernetes / Compute Resources / Cluster** — whole cluster CPU and memory at a glance
+- **Kubernetes / Compute Resources / Node** — drill into a single node
+- **Node Exporter / Nodes** — OS-level metrics: disk, network, system load
+
+---
+
+## Full Picture — How Data Flows
+
+```
+Each node (OS level)
+    node-exporter running on master, node1, node2
+        │ CPU, memory, disk, network stats
+        ▼
+Kubernetes API
+    kube-state-metrics watching deployments, pods, services
+        │ replica counts, pod phases, resource requests
+        ▼
+Prometheus
+    scrapes both every 30 seconds, stores time-series data
+        │
+        ▼
+Grafana
+    queries Prometheus, draws charts you can actually read
+        │
+        ▼
+You, in a browser, understanding what the cluster is doing
+```
