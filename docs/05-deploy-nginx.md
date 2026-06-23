@@ -1,4 +1,4 @@
-# 05 — Deploy nginx (Cluster Verification)
+# 05 > Deploy nginx (Cluster Verification)
 
 With all 3 nodes `Ready` and Cilium healthy, a simple nginx deployment was used to verify end-to-end cluster networking and service exposure.
 
@@ -27,8 +27,6 @@ curl http://<ANY_NODE_IP>:<NODE_PORT>
 A successful response returns the nginx welcome page — confirming pod scheduling, Cilium networking, and NodePort service routing all work end-to-end. ✅
 
 > Equivalent manifest-based version of this deployment lives in `manifests/nginx-deployment.yaml` and `manifests/nginx-service.yaml`, for anyone who wants to `kubectl apply -f` instead of using imperative commands.
-
----
 
 ## Verification Checklist
 
