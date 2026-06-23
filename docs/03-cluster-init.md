@@ -27,7 +27,6 @@ kubectl get nodes
 ## Phase 4 - Join Worker Nodes (node1 AND node2)
 
 SSH into each worker and run the join command captured above:
-
 ```bash
 kubeadm join <MASTER_IP>:6443 \
   --token <TOKEN> \
