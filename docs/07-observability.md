@@ -137,6 +137,8 @@ https://<ANY_NODE_IP>:<NODE_PORT>
 Click through the cert warning, paste the token, you're in.
 
 
+![K8-Dashboard](../images/K8-dashboard.png)
+
 ## Installing Prometheus + Grafana
 
 Both come bundled via `kube-prometheus-stack` — one chart, sets up everything including the pre-built Grafana dashboards. No reason to install them separately.
@@ -181,7 +183,7 @@ kubectl get secret -n monitoring prometheus-grafana \
 ```
 http://<ANY_NODE_IP>:<GRAFANA_PORT>
 ```
-
+![grafana](../images/grafana.png)
 Change the password immediately — Profile → Change Password.
 
 ### Exposing Prometheus (optional, for raw querying)
@@ -197,7 +199,7 @@ kubectl get svc prometheus-kube-prometheus-prometheus -n monitoring
 ```
 http://<ANY_NODE_IP>:<PROMETHEUS_PORT>
 ```
-
+![prometheus](../images/Prometheus.png)
 ## Metrics Server (needed for `kubectl top`)
 
 Without this, `kubectl top nodes` and the CPU/memory graphs in Dashboard just don't work.
