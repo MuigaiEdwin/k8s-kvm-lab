@@ -1,9 +1,9 @@
-# 03 — Cluster Initialization (kubeadm init + join)
+# 03 > Cluster Initialization (kubeadm init + join)
 
 With prerequisites satisfied on all nodes (`02-prerequisites.md`), the control plane was initialized on `master`, then `node1` and `node2` joined as workers.
 
 
-## Phase 3 — Initialize the Cluster (MASTER ONLY)
+## Phase 3 - Initialize the Cluster (MASTER ONLY)
 
 ```bash
 kubeadm init \
@@ -26,7 +26,7 @@ kubectl get nodes
 
 ---
 
-## Phase 4 — Join Worker Nodes (node1 AND node2)
+## Phase 4 - Join Worker Nodes (node1 AND node2)
 
 SSH into each worker and run the join command captured above:
 
