@@ -24,8 +24,6 @@ chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl get nodes
 ```
 
----
-
 ## Phase 4 - Join Worker Nodes (node1 AND node2)
 
 SSH into each worker and run the join command captured above:
@@ -48,7 +46,5 @@ On master, verify both workers joined:
 kubectl get nodes
 # All 3 will show NotReady — correct, no CNI yet
 ```
-
----
 
 Next step: install Cilium so all nodes flip to `Ready` — see `04-cilium.md`.
