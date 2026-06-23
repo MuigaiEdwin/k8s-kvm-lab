@@ -2,7 +2,7 @@
 
 With the cluster up, Cilium healthy, and the nginx verification deployment working (`05-deploy-nginx.md`), the Kubernetes Dashboard was deployed as a web UI for inspecting and managing cluster resources.
 
-Reference: [Deploy and Access the Kubernetes Dashboard — kubernetes.io](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
+Reference: [Deploy and Access the Kubernetes Dashboard - kubernetes.io](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
 
 ## Step 1 — Deploy the Dashboard
 
@@ -25,9 +25,7 @@ kubectl get svc -n kubernetes-dashboard
 
 All pods should reach `Running`.
 
----
-
-## Step 2 — Create an Admin Service Account
+## Step 2 - Create an Admin Service Account
 
 The Dashboard needs a token to authenticate. A dedicated admin service account was created rather than reusing the default one:
 
@@ -45,9 +43,8 @@ kubectl create clusterrolebinding dashboard-admin-sa \
 
 > **Note:** `cluster-admin` grants full cluster access. That's fine for a personal lab; for anything shared or production-like, scope this down to a narrower Role/ClusterRole instead.
 
----
 
-## Step 3 — Generate a Login Token
+## Step 3 - Generate a Login Token
 
 ```bash
 kubectl -n kubernetes-dashboard create token dashboard-admin-sa
@@ -55,9 +52,7 @@ kubectl -n kubernetes-dashboard create token dashboard-admin-sa
 
 This prints a token (`<TOKEN>`) — copy it. It's short-lived by default; regenerate with the same command whenever it expires.
 
----
-
-## Step 4 — Access the Dashboard
+## Step 4 - Access the Dashboard
 
 The Dashboard's API server is ClusterIP-only by default, so it's not reachable directly from outside the cluster. `kubectl proxy` was used to tunnel access:
 
@@ -73,7 +68,6 @@ http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 
 Open that URL in a browser, choose **Token** as the sign-in method, and paste the `<TOKEN>` from Step 3.
 
----
 
 ## Known Issues & Fixes
 
@@ -101,7 +95,6 @@ Treat this as throwaway-lab convenience only — it removes a layer of access co
 kubectl -n kubernetes-dashboard create token dashboard-admin-sa
 ```
 
----
 
 ## Verification Checklist
 
