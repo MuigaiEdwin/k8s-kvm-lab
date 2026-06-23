@@ -1,4 +1,4 @@
-02 — Kubernetes Prerequisites (All Nodes)
+# 02 > Kubernetes Prerequisites (All Nodes)
 
 These steps were run on **every node** (`master`, `node1`, `node2`) as root, after the VMs were provisioned (see `01-virtualization.md`).
 
@@ -15,9 +15,8 @@ These steps were run on **every node** (`master`, `node1`, `node2`) as root, aft
 
 **Kernel note:** Ubuntu 20.04 ships with kernel 5.4 by default. Cilium's eBPF dataplane requires `bpf_get_current_cgroup_id()`, which the stock 5.4 kernel build doesn't fully expose even though the version number technically meets the minimum. The HWE kernel (5.15) was installed on all nodes before installing Cilium.
 
----
 
-## 2.1 — Disable swap
+## 2.1 - Disable swap
 
 ```bash
 swapoff -a
@@ -27,7 +26,7 @@ sed -i '/swap/s/^/#/' /etc/fstab
 free -h | grep Swap   # should show 0B
 ```
 
-## 2.2 — Enable kernel modules
+## 2.2 - Enable kernel modules
 
 ```bash
 cat <<EOF | tee /etc/modules-load.d/k8s.conf
@@ -39,7 +38,7 @@ modprobe overlay
 modprobe br_netfilter
 ```
 
-## 2.3 — Configure sysctl
+## 2.3 - Configure sysctl
 
 ```bash
 cat <<EOF | tee /etc/sysctl.d/k8s.conf
@@ -51,7 +50,7 @@ EOF
 sysctl --system
 ```
 
-## 2.4 — Install containerd
+## 2.4 - Install containerd
 
 ```bash
 apt-get update
@@ -66,9 +65,9 @@ apt-get update
 apt-get install -y containerd.io
 ```
 
-## 2.5 — Configure containerd (critical step)
+## 2.5 - Configure containerd (critical step)
 
-The default containerd install ships with the CRI plugin disabled. This config must be regenerated with `SystemdCgroup` enabled — skipping this causes `kubeadm join` to fail with a CRI error.
+The default containerd install ships with the CRI plugin disabled. This config must be regenerated with `SystemdCgroup` enabled - skipping this causes `kubeadm join` to fail with a CRI error.
 
 ```bash
 mkdir -p /etc/containerd
@@ -82,7 +81,7 @@ systemctl enable containerd
 systemctl status containerd   # must show active (running)
 ```
 
-## 2.6 — Install kubeadm, kubelet, kubectl
+## 2.6 - Install kubeadm, kubelet, kubectl
 
 ```bash
 mkdir -p /etc/apt/keyrings
@@ -98,16 +97,16 @@ apt-get install -y kubeadm kubelet kubectl
 apt-mark hold kubeadm kubelet kubectl
 
 systemctl enable --now kubelet
-# kubelet will show 'activating' until kubeadm init runs — this is normal
+# kubelet will show 'activating' until kubeadm init runs - this is normal
 ```
 
-## 2.7 — Install the HWE kernel (required for Cilium)
+## 2.7 - Install the HWE kernel (required for Cilium)
 
 ```bash
 apt-get install -y linux-generic-hwe-20.04
 update-grub
 
-# Reboot one node at a time — do NOT reboot all simultaneously
+# Reboot one node at a time - do NOT reboot all simultaneously
 reboot
 ```
 
@@ -117,6 +116,5 @@ After reboot, verify:
 uname -r   # should show 5.15.x or higher
 ```
 
----
 
 Once all three nodes pass these steps, proceed to `03-cluster-init.md`.
