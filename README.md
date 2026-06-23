@@ -69,7 +69,7 @@ Stack:
 
 ## Manifests
 
-Ready-to-use Kubernetes manifests are in the [`manifests/`](manifests/) folder:
+Ready-to-use Kubernetes manifests are in the [`manifests/`](./manifests/) folder:
 
 - `nginx-deployment.yaml` — 2-replica nginx deployment
 - `nginx-service.yaml` — NodePort service
