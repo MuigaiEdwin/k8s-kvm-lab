@@ -1,8 +1,8 @@
-# 04 — Cilium CNI Install + Kernel Fix
+# 04 > Cilium CNI Install + Kernel Fix
 
 After all 3 nodes joined the cluster (still showing `NotReady` — expected, no CNI yet), Cilium was installed as the CNI on the **master** node.
 
-## Phase 5 — Install Cilium CNI (MASTER ONLY)
+## Phase 5 - Install Cilium CNI (MASTER ONLY)
 
 ```bash
 curl -LO https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
@@ -23,7 +23,6 @@ kubectl get nodes
 # node2    Ready    <none>          v1.29.x
 ```
 
----
 
 ## Kernel Fix (root cause hit during setup)
 
@@ -60,15 +59,14 @@ All Cilium agent pods should be `Running`, and `cilium status` should report ove
 
 Next: deploy the verification workload — see `05-deploy-nginx.md`.
 
----
 
-## Known Issue — Pod Stuck in `Terminating`
+## Known Issue - Pod Stuck in `Terminating`
 
 **Symptom:** A pod hangs indefinitely in `Terminating` state and never fully deletes.
 
 **Cause:** Usually a cgroup path mismatch between containerd and kubelet, or a stale CNI attachment left behind by Cilium during a network change.
 
-**Fix — force delete the pod:**
+**Fix - force delete the pod:**
 
 ```bash
 kubectl delete pod <pod-name> --grace-period=0 --force
