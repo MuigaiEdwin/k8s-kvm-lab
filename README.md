@@ -72,3 +72,11 @@ Ready-to-use Kubernetes manifests are in the [`manifests/`](./manifests/) folder
 ## Confidentiality Note
 
 All IP addresses, hostnames, MAC addresses, tokens, and certificate hashes in this guide are placeholders. Replace them with your own values. 
+
+## Quick Start
+After cloning and setting up the cluster, run:
+```bash
+./startup.sh
+```
+
+To bring up all services after a reboot.
