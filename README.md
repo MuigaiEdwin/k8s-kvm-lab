@@ -4,8 +4,6 @@ A complete, reproducible guide to building a 3-node Kubernetes cluster from scra
 
 This isn't a "just run this script" guide. Every step is explained, every real error encountered during setup is documented with its fix, and the reasoning behind each decision is included so you understand what you're doing and why.
 
----
-
 ## What This Builds
 
 ```
@@ -24,7 +22,6 @@ Stack:
   Test app    →  nginx (NodePort)
 ```
 
----
 
 ## Guides — Follow in Order
 
@@ -37,7 +34,6 @@ Stack:
 | 05 | [Deploy & Verify](./docs/05-deploy-nginx.md) | nginx deployment, NodePort, verification |
 | 06 | [Deploy and access the web UI dashboard](./docs/06-observability.md) | K8, Grafana, verification |
 
----
 
 ## Quick Specs
 
@@ -53,7 +49,6 @@ Stack:
 | Container runtime | containerd |
 | Kernel required | 5.15+ (HWE) |
 
----
 
 ## Known Issues Quick Reference
 
@@ -65,7 +60,6 @@ Stack:
 | Node loses IP after reboot | Set static IP on master via netplan | [01](./docs/01-virtualization.md) |
 | Pod stuck in `Terminating` | Force delete + restart containerd | [04](./docs/04-cilium.md) |
 
----
 
 ## Manifests
 
@@ -74,7 +68,6 @@ Ready-to-use Kubernetes manifests are in the [`manifests/`](./manifests/) folder
 - `nginx-deployment.yaml` — 2-replica nginx deployment
 - `nginx-service.yaml` — NodePort service
 
----
 
 ## Confidentiality Note
 
