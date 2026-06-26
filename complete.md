@@ -3,7 +3,6 @@
 
 A fully reproducible guide to setting up a 3-node Kubernetes cluster from scratch using KVM virtual machines on a Linux host — including every real issue hit during setup and exactly how they were fixed.
 
----
 
 ## Architecture
 
@@ -19,7 +18,6 @@ CNI:     Cilium (eBPF)
 Runtime: containerd
 ```
 
----
 
 ## Prerequisites
 
@@ -35,9 +33,8 @@ Runtime: containerd
 
 > **Kernel note:** Ubuntu 20.04 ships with kernel 5.4 by default. Cilium's eBPF dataplane requires `bpf_get_current_cgroup_id()` which the stock 5.4 kernel build does not fully expose even though the version number technically meets the minimum. Install the HWE kernel (5.15) on all nodes before installing Cilium.
 
----
 
-## Phase 1 — Create the VMs
+## Phase 1 - Create the VMs
 
 ```bash
 # Create each VM — repeat for node1 and node2 changing --name and --disk path
@@ -60,9 +57,8 @@ During Ubuntu installation on each VM:
 - ✅ **Tick "Install OpenSSH server"**
 - Skip all optional snaps
 
----
 
-## Phase 2 — Kubernetes Prerequisites (ALL 3 NODES)
+## Phase 2 - Kubernetes Prerequisites (ALL 3 NODES)
 
 SSH into each node and run the following as root.
 
@@ -165,7 +161,6 @@ After reboot, verify:
 uname -r   # should show 5.15.x or higher
 ```
 
----
 
 ## Phase 3 — Initialize the Cluster (MASTER ONLY)
 
@@ -184,13 +179,13 @@ mkdir -p $HOME/.kube
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 
-# Verify — master will show NotReady until Cilium is installed
+# Verify - master will show NotReady until Cilium is installed
 kubectl get nodes
 ```
 
 ---
 
-## Phase 4 — Join Worker Nodes (node1 AND node2)
+## Phase 4 - Join Worker Nodes (node1 AND node2)
 
 SSH into each worker and run the join command from Phase 3:
 
@@ -210,12 +205,11 @@ On master, verify both workers joined:
 
 ```bash
 kubectl get nodes
-# All 3 will show NotReady — correct, no CNI yet
+# All 3 will show NotReady - correct, no CNI yet
 ```
 
----
 
-## Phase 5 — Install Cilium CNI (MASTER ONLY)
+## Phase 5 - Install Cilium CNI (MASTER ONLY)
 
 ```bash
 curl -LO https://github.com/cilium/cilium-cli/releases/latest/download/cilium-linux-amd64.tar.gz
@@ -236,9 +230,8 @@ kubectl get nodes
 # node2    Ready    <none>          v1.29.x
 ```
 
----
 
-## Phase 6 — Deploy nginx (Verification)
+## Phase 6 - Deploy nginx (Verification)
 
 ```bash
 # Create a 2-replica nginx deployment
@@ -258,7 +251,6 @@ curl http://<ANY_NODE_IP>:<NODE_PORT>
 
 You should get the nginx welcome page. ✅
 
----
 
 ## Known Issues & Fixes
 
@@ -272,7 +264,6 @@ sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.t
 systemctl restart containerd
 ```
 
----
 
 ### Cilium agent fails on Ubuntu 20.04 stock kernel
 **Error:** `bpf_get_current_cgroup_id() not available`
@@ -292,7 +283,6 @@ sed -i '/swap/s/^/#/' /etc/fstab
 swapoff -a
 ```
 
----
 
 ### Node loses IP after reboot (DHCP delay)
 **Fix:** If SSH is unreachable after reboot, use console access and renew DHCP:
@@ -322,7 +312,6 @@ network:
 netplan apply
 ```
 
----
 
 ### Pod stuck in Terminating
 **Fix:** Force delete it:
@@ -335,8 +324,6 @@ containerd config default | tee /etc/containerd/config.toml
 sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
 systemctl restart containerd
 ```
-
----
 
 ## Verification Checklist
 
@@ -353,8 +340,6 @@ cilium status
 # nginx accessible
 curl http://<ANY_NODE_IP>:<NODE_PORT>
 ```
-
----
 
 ## What's Next
 
