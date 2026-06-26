@@ -23,7 +23,7 @@ Stack:
 ```
 
 
-## Guides — Follow in Order
+## Guides - Follow in Order
 
 | # | Document | What it covers |
 |---|---|---|
@@ -32,7 +32,8 @@ Stack:
 | 03 | [Cluster Initialization](./docs/03-cluster-init.md) | kubeadm init on master, join workers |
 | 04 | [Cilium CNI](./docs/04-cilium.md) | Install CNI, fix HWE kernel requirement |
 | 05 | [Deploy & Verify](./docs/05-deploy-nginx.md) | nginx deployment, NodePort, verification |
-| 06 | [Deploy and access the web UI dashboard](./docs/06-observability.md) | K8, Grafana, verification |
+| 06 | [Deploy and access the web UI dashboard](./docs/06-observability.md) | K8, Grafana, Prometheus |
+| 09 | [the lists prolongs](./docs/) | Building what Next |
 
 
 ## Quick Specs
@@ -77,6 +78,10 @@ All IP addresses, hostnames, MAC addresses, tokens, and certificate hashes in th
 After cloning and setting up the cluster, run:
 ```bash
 ./startup.sh
+```
+then make it excetubale
+```bash
+chmod +x ~/startup.sh
 ```
 
 To bring up all services after a reboot.
