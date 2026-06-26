@@ -209,6 +209,7 @@ kubectl -n kube-system port-forward --address 0.0.0.0 svc/hubble-ui 12000:80
 ```
 
 Opened browser at http://[control-plane-ip]:12000 and confirmed the Hubble service map was live, showing real-time pod-to-pod traffic flows across namespaces.
+![Hubble-UI](../images/Hubble.png)
 
 ## Issue 6: Docker Running on a Cilium-Managed Node
 
@@ -244,7 +245,7 @@ Docker and Cilium cannot coexist cleanly on the same node. Docker manages its ow
 
 The Hubble relay consistently shows flows from 2 out of 3 nodes. The affected worker node's Cilium agent reports Hubble as healthy locally, port 4244 is reachable, and the node itself is Ready and running workloads correctly. The relay connects successfully but then receives a TLS certificate verification error from the Cilium CA.
 
-This appears to be a certificate trust issue specific to this node stemming from it having been rebuilt mid-cluster-life, leaving its Cilium CA certificates out of sync with the rest of the cluster. The node's workloads and networking function correctly — this only affects Hubble flow visibility for that node.
+This appears to be a certificate trust issue specific to this node stemming from it having been rebuilt mid-cluster-life, leaving its Cilium CA certificates out of sync with the rest of the cluster. The node's workloads and networking function correctly - this only affects Hubble flow visibility for that node.
 
 This is noted as a pending item to resolve with a full node rebuild using kubeadm join to rejoin the cluster cleanly.
 
