@@ -7,7 +7,7 @@ This isn't a "just run this script" guide. Every step is explained, every real e
 ## What This Builds
 
 ```
-Linux Host (RHEL/Ubuntu) — KVM + QEMU + libvirt
+Linux Host (RHEL/Ubuntu) - KVM + QEMU + libvirt
         │
         ├── master    Control plane    <MASTER_IP>
         ├── node1     Worker node      <NODE1_IP>
@@ -66,8 +66,8 @@ Stack:
 
 Ready-to-use Kubernetes manifests are in the [`manifests/`](./manifests/) folder:
 
-- `nginx-deployment.yaml` — 2-replica nginx deployment
-- `nginx-service.yaml` — NodePort service
+- `nginx-deployment.yaml` - 2-replica nginx deployment
+- `nginx-service.yaml` -NodePort service
 
 
 ## Confidentiality Note
