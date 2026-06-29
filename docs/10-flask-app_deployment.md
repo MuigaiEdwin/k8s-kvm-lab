@@ -65,7 +65,8 @@ flask-backend-777cb86f4d-9sc8t   1/1     Running   0          2m
 curl http://<node-ip>:30500
 ```
 Response:
-![app-screenshot](../images/flask-app.py)
+
+![app-screenshot](../images/flask-app.png)
 
 ## Key Notes
 
