@@ -64,12 +64,8 @@ flask-backend-777cb86f4d-9sc8t   1/1     Running   0          2m
 ```bash
 curl http://<node-ip>:30500
 ```
-[app-screenshot](../images/)
 Response:
-
-```json
-{"hostname": "flask-backend-777cb86f4d-2xxmp", "message": "Hello from the backend!", "version": "v1.0"}
-```
+![app-screenshot](../images/flask-app.py)
 
 ## Key Notes
 
