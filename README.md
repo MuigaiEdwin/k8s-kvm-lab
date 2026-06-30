@@ -27,13 +27,13 @@ Stack:
 
 | # | Document | What it covers |
 |---|---|---|
-| 01 | [Virtualization Setup](./docs/01-virtualization.md) | Install KVM on RHEL host, create 3 VMs |
-| 02 | [Kubernetes Prerequisites](./docs/02-prerequisites.md) | Prepare all 3 nodes before kubeadm |
-| 03 | [Cluster Initialization](./docs/03-cluster-init.md) | kubeadm init on master, join workers |
-| 04 | [Cilium CNI](./docs/04-cilium.md) | Install CNI, fix HWE kernel requirement |
-| 05 | [Deploy & Verify](./docs/05-deploy-nginx.md) | nginx deployment, NodePort, verification |
-| 06 | [Deploy and access the web UI dashboard](./docs/06-observability.md) | K8, Grafana, Prometheus |
-| 09 | [the lists prolongs](./docs/) | Building what Next |
+| 01 | [Virtualization Setup](./runbook/01-virtualization.md) | Install KVM on RHEL host, create 3 VMs |
+| 02 | [Kubernetes Prerequisites](./runbook/02-prerequisites.md) | Prepare all 3 nodes before kubeadm |
+| 03 | [Cluster Initialization](./runbook/03-cluster-init.md) | kubeadm init on master, join workers |
+| 04 | [Cilium CNI](./runbook/04-cilium.md) | Install CNI, fix HWE kernel requirement |
+| 05 | [Deploy & Verify](./runbook/05-deploy-nginx.md) | nginx deployment, NodePort, verification |
+| 06 | [Deploy and access the web UI dashboard](./runbook/06-observability.md) | K8, Grafana, Prometheus |
+| 09 | [the lists prolongs](./runbook/) | Building what Next |
 
 
 ## Quick Specs
@@ -55,11 +55,11 @@ Stack:
 
 | Error | Fix | Doc |
 |---|---|---|
-| `unknown service runtime.v1.RuntimeService` | Regenerate containerd config | [02](./docs/02-prerequisites.md) |
-| `bpf_get_current_cgroup_id() not available` | Install HWE kernel (5.15) | [04](./docs/04-cilium.md) |
-| Swap re-enables after reboot | Comment out swap in `/etc/fstab` | [02](./docs/02-prerequisites.md) |
-| Node loses IP after reboot | Set static IP on master via netplan | [01](./docs/01-virtualization.md) |
-| Pod stuck in `Terminating` | Force delete + restart containerd | [04](./docs/04-cilium.md) |
+| `unknown service runtime.v1.RuntimeService` | Regenerate containerd config | [02](./runbook/02-prerequisites.md) |
+| `bpf_get_current_cgroup_id() not available` | Install HWE kernel (5.15) | [04](./runbook/04-cilium.md) |
+| Swap re-enables after reboot | Comment out swap in `/etc/fstab` | [02](./runbook/02-prerequisites.md) |
+| Node loses IP after reboot | Set static IP on master via netplan | [01](./runbook/01-virtualization.md) |
+| Pod stuck in `Terminating` | Force delete + restart containerd | [04](./runbook/04-cilium.md) |
 
 
 ## Manifests
