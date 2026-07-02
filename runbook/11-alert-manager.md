@@ -115,6 +115,8 @@ Then open browser: `http://localhost:9093`
 
 Click **Status** tab. Config section should show your email receiver (not "null").
 
+![Email -Alert-Manager-UI](../images/alert-m-ui.png)
+
 ## Result
 
 Alerts now email you automatically. Real alerts fire within minutes and land in your inbox. Screenshot shown below.
