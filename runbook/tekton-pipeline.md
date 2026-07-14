@@ -1,4 +1,4 @@
-# Tekton Pipelines Install — Commands Reference
+# Tekton Pipelines Install
 
 Companion to the main README. This documents the actual commands run, in order, with placeholders in place of any cluster-identifying or sensitive values.
 
@@ -91,7 +91,7 @@ lsblk -f
 oc adm top node <node-name>
 ```
 
-## 6. Ceph via Rook (OpenShift-specific) — in progress
+## 6. Ceph via Rook (OpenShift-specific) >> Work in  progress 
 
 ```powershell
 git clone --single-branch --branch v1.14.x https://github.com/rook/rook.git
