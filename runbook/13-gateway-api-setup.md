@@ -111,4 +111,4 @@ kubectl get httproutes -n monitoring
 
 ## Access
 http://<CLUSTER_NODE_IP>:32081 (I can now access the grafana via the Gateway API port)
-![Grafana Dachboard](../images/grafana-via-gateway-api)
+![Grafana Dachboard](../images/grafana-via-gateway-api.png)
