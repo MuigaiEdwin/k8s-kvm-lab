@@ -107,13 +107,6 @@ Each one traced back with the actual job logs, not guesswork - `docker info | gr
 
 ![Pipeline passing end to end](../images/07-pipeline-passed.png)
 
-```
-edit app.py → git push
-    → GitLab Runner triggers automatically
-    → build-image: docker build → docker login → docker push to Harbor
-    → update-manifest: rewrites deployment.yaml, commits [skip ci], pushes
-    → ArgoCD detects the new commit → sync → pod redeployed
-```
 
 Confirmed the deployed pod's image tag matched the exact commit hash CI built from:
 ```bash
@@ -122,6 +115,34 @@ kubectl get pods -l app=lab-status -o jsonpath='{.items[0].spec.containers[0].im
 ```
 No manual Docker or `kubectl` command touched that pod after the `git push`.
 
+## Turned on full automation - closed the last manual gap
+
+Everything up to this point was automated except one thing: ArgoCD's lab-status Application still had Sync Policy: Manual. CI would build and push a new image and update the manifest, but ArgoCD would just sit there showing OutOfSync until I ran argocd app sync myself.
+
+Closed that gap:
+
+bash
+argocd app set lab-status --sync-policy automated --auto-prune --self-heal
+
+What each flag actually does:
+
+automated - removes the manual gate. Any OutOfSync state gets applied immediately, no sync command needed.
+--auto-prune - if a resource is ever removed from the manifest in git, ArgoCD deletes it from the cluster too, not just additions.
+--self-heal - if someone edits something directly on the cluster (bypassing git), ArgoCD reverts it back to match git automatically.
+
+Tradeoff worth naming honestly: this removes the human checkpoint between "CI built something" and "it's live." Fine for lab-status, a throwaway learning app. I'm deliberately keeping flask-backend on Manual - anything closer to real traffic deserves a human glance before it goes live, even in a lab.
+
+## The full workflow, start to finish
+
+1. Edit app.py, git push
+2. GitLab sees .gitlab-ci.yml → pipeline starts automatically
+3. My GitLab Runner (on master) picks up the build-image job
+4. docker build → docker login → docker push → new tagged image lands in Harbor
+5. update-manifest job rewrites deployment.yaml's image: line,
+   commits with [skip ci], pushes back to main — CI writing to git, not me
+6. ArgoCD (polling git independently, ~every 3 min) sees the new commit
+7. Because sync policy is automated, ArgoCD applies it immediately — no human step
+8. Kubernetes rolls the pod: new image up, health checks pass, old pod terminates 
 
 ## Resources
 
