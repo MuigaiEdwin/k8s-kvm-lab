@@ -5,7 +5,6 @@ I wanted to stop deploying to my lab cluster by hand and start managing it the G
 Official reference I followed: [Argo CD Getting Started -> official docs](https://argo-cd.readthedocs.io/en/stable/getting_started/)
 Additional resource : [Installing on Kunernetes](https://computingforgeeks.com/install-argocd-kubernetes/)
 
----
 
 ## 1. Installed ArgoCD
 
@@ -24,7 +23,7 @@ kubectl get pods -n argocd -w
 I ran this to watch the pods come up. Once every pod showed `Running`, I moved on.
 
 ![Pods-Coming_up](../images/pod-comming-up.png)
----
+
 
 ## 2. Installed the ArgoCD CLI
 
@@ -35,7 +34,6 @@ rm argocd-linux-amd64
 ```
 I ran this. It downloaded the ArgoCD CLI binary and installed it system-wide, so `argocd` works as a command from anywhere.
 
----
 
 ## 3. Accessed the ArgoCD UI
 
@@ -53,7 +51,6 @@ kubectl -n argocd get svc argocd-server -o jsonpath='{.spec.ports[?(@.name=="htt
 ```
 I ran this to get the actual assigned port, then browsed to `https://<node-ip>:<that-port>` -> that got me into the UI.
 
----
 
 ## 4. Got the initial admin password, then changed it
 
@@ -92,7 +89,7 @@ I ran this to confirm. Status showed `Successful`.
 
 For pushing to the repo myself (not ArgoCD's job), I generated a **second** token with `Code: Push` scope, kept separate from the read-only one ArgoCD uses. Two tokens, two purposes -> ArgoCD only ever reads, I'm the only one who writes.
 
----
+
 
 ## 6. Set up a git credential helper
 
@@ -103,7 +100,6 @@ git config --global credential.helper store
 ```
 I ran this. On the next push it asked once, then cached the credentials in `~/.git-credentials` in plaintext. That's an acceptable tradeoff on a personal lab VM where I'm the only root user -> not something I'd do on shared or production infrastructure.
 
----
 
 ## 7. Created my first Application -> a test namespace
 
@@ -138,7 +134,6 @@ kubectl get namespace argocd-test
 ```
 I ran this to confirm -> namespace existed, `Active`. Full loop proven: file in git → ArgoCD → real resource on the cluster.
 
----
 
 ## 8. Adopted an existing workload -> flask-backend
 
@@ -172,7 +167,6 @@ kubectl get pods -l app=flask-backend
 ```
 Same pod names, same restart counts, no downtime. ArgoCD had taken ownership without disturbing anything already running.
 
----
 
 ## 9. Tested a real change -> scaling via git
 
@@ -196,7 +190,6 @@ I ran this. Only now did the cluster actually change -> Kubernetes created a thi
 
 **The lesson that stuck:** ArgoCD noticing a change and ArgoCD acting on a change are two different, deliberate steps. Nothing happens to the cluster between a `git push` and running `sync` -> that gap is the safety net, not a bug.
 
----
 
 ## Resources
 
