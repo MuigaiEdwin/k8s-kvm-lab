@@ -121,16 +121,17 @@ Everything up to this point was automated except one thing: ArgoCD's lab-status 
 
 Closed that gap:
 
-bash
+```bash
 argocd app set lab-status --sync-policy automated --auto-prune --self-heal
 
+```
 What each flag actually does:
 
 automated - removes the manual gate. Any OutOfSync state gets applied immediately, no sync command needed.
 --auto-prune - if a resource is ever removed from the manifest in git, ArgoCD deletes it from the cluster too, not just additions.
 --self-heal - if someone edits something directly on the cluster (bypassing git), ArgoCD reverts it back to match git automatically.
 
-Tradeoff worth naming honestly: this removes the human checkpoint between "CI built something" and "it's live." Fine for lab-status, a throwaway learning app. I'm deliberately keeping flask-backend on Manual - anything closer to real traffic deserves a human glance before it goes live, even in a lab.
+Tradeoff: this removes the human checkpoint between "CI built something" and "it's live." Fine for lab-status, a throwaway learning app. I'm deliberately keeping flask-backend on Manual - anything closer to real traffic deserves a human glance before it goes live, even in a lab.
 
 ## The full workflow, start to finish
 
